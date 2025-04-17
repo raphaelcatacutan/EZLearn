@@ -1,5 +1,6 @@
 package com.plm.ezlearn
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,7 +20,7 @@ import com.plm.ezlearn.ui.pages.ViewNumblast
 import com.plm.ezlearn.ui.pages.ViewNumline
 import com.plm.ezlearn.ui.pages.ViewOddle
 import com.plm.ezlearn.ui.pages.ViewShapely
-import com.plm.ezlearn.ui.pages.ViewTicktoky
+import com.plm.ezlearn.ui.pages.ViewTickTocky
 import com.plm.ezlearn.ui.theme.EZLearnTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
@@ -46,7 +48,7 @@ fun AppNavigation() {
         composable("numline") { ViewNumline(navController) }
         composable("oddle") { ViewOddle(navController) }
         composable("shapely") { ViewShapely(navController) }
-        composable("ticktocky") { ViewTicktoky(navController) }
+        composable("ticktocky") { ViewTickTocky(navController) }
     }
 
     AnimatedContent(targetState = navController.currentBackStackEntry) { _ ->
@@ -60,7 +62,7 @@ fun AppNavigation() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun PreviewMainActivity() {
     EZLearnTheme {
         AppNavigation()
     }
