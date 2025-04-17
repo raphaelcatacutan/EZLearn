@@ -104,7 +104,7 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
         ) {
             items(menuItems.size) { index ->
                 val item = menuItems[index]
-                ComponentMenuItemCard(title = item.title, imageRes = item.imageRes)
+                ComponentMenuItemCard(navController, item.title, item.imageRes, item.path)
             }
 
         }
@@ -112,14 +112,15 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
 }
 
 @Composable
-fun ComponentMenuItemCard(title: String, imageRes: Int) {
+fun ComponentMenuItemCard(navController: NavController, title: String, imageRes: Int, navPath: String) {
     Card(
         modifier = Modifier
             .height(120.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        onClick = { navController.navigate(navPath) }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,15 +139,15 @@ fun ComponentMenuItemCard(title: String, imageRes: Int) {
 }
 
 // Example menu items
-data class MenuItem(val title: String, val imageRes: Int)
+data class MenuItem(val title: String, val imageRes: Int, val path: String)
 
 val menuItems = listOf(
-    MenuItem("Numblast", R.drawable.bg),
-    MenuItem("Colormix", R.drawable.bg),
-    MenuItem("TickTocky", R.drawable.bg),
-    MenuItem("Oddle", R.drawable.bg),
-    MenuItem("Shapely", R.drawable.bg),
-    MenuItem("Numline", R.drawable.bg)
+    MenuItem("Numblast", R.drawable.bg, "numblast"),
+    MenuItem("Colormix", R.drawable.bg, "colormix"),
+    MenuItem("TickTocky", R.drawable.bg, "ticktocky"),
+    MenuItem("Oddle", R.drawable.bg, "oddle"),
+    MenuItem("Shapely", R.drawable.bg, "shapely"),
+    MenuItem("Numline", R.drawable.bg, "numline")
 )
 
 @Preview(showBackground = true)

@@ -44,7 +44,7 @@ fun AppNavigation() {
         composable("colormix") { ViewColormix(navController) }
         composable("numblast") { ViewNumblast(navController) }
         composable("numline") { ViewNumline(navController) }
-        composable("oddly") { ViewOddle(navController) }
+        composable("oddle") { ViewOddle(navController) }
         composable("shapely") { ViewShapely(navController) }
         composable("ticktocky") { ViewTicktoky(navController) }
     }
