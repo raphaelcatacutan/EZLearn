@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,8 +59,10 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
     val lives: Int = 3
     val timerProgress: Float = 0.7f // value between 0 and 1
     val onBackClick: () -> Unit = {showExplanation = true}
+    val backgroundImage = painterResource(id = R.drawable.bg1)
 
     Box(modifier = Modifier.fillMaxSize()) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
