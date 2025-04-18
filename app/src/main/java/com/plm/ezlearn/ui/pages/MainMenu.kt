@@ -126,12 +126,12 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
                     imageRes = item.imageRes,
                     onClick = {
                         instructionMenu = item
-                        showInstructionDialog = true // Restored interaction functionality
+                        showInstructionDialog = true
                     },
                     modifier = Modifier
-                        .padding(8.dp) // Adds space between cards
-                        .fillMaxWidth() // Ensures cards span the grid width
-                        .height(150.dp) // Sets consistent card height
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .height(150.dp)
                 )
             }
         }
@@ -256,17 +256,22 @@ fun DialogGameInstruction(
             }
 
             // Image floating above the dialog
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .size(80.dp)
                     .align(Alignment.TopCenter)
-                    .offset(y = (-10).dp) // Overflow effect
-                    .shadow(4.dp, shape = CircleShape)
-                    .background(Color.White, shape = CircleShape)
-                    .padding(4.dp) // Optional image padding
-            )
+                    .offset(y = (-10).dp)
+                    .shadow(4.dp, shape = RoundedCornerShape(8.dp)) // Applies rounded shadow
+                    .background(Color.White, shape = RoundedCornerShape(8.dp))
+                    .padding(4.dp) // Optional padding within the container
+            ) {
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }
