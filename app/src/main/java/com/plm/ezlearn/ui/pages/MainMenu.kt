@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,10 +53,15 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
     var showInstructionDialog by remember { mutableStateOf(false) }
     var instructionMenu by remember {mutableStateOf(MenuItem("", 0, "", ""))}
 
+    Image(
+        painter = painterResource(id = R.drawable.bg),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFB3E5FC)) // Light blue background
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -109,10 +114,10 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
         // Menu buttons in grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxHeight()
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier.fillMaxSize()
         ) {
             items(menuItems.size) { index ->
                 val item = menuItems[index]
@@ -121,11 +126,16 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
                     imageRes = item.imageRes,
                     onClick = {
                         instructionMenu = item
-                        showInstructionDialog = true
-                    }
+                        showInstructionDialog = true // Restored interaction functionality
+                    },
+                    modifier = Modifier
+                        .padding(8.dp) // Adds space between cards
+                        .fillMaxWidth() // Ensures cards span the grid width
+                        .height(150.dp) // Sets consistent card height
                 )
             }
         }
+
         if (showInstructionDialog) {
             DialogGameInstruction(
                 message = instructionMenu.instruction,
@@ -141,28 +151,41 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
 }
 
 @Composable
-fun ComponentMenuItemCard(title: String, imageRes: Int, onClick: () -> Unit) {
+fun ComponentMenuItemCard(
+    title: String,
+    imageRes: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
-            .height(120.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        modifier = modifier
+            .fillMaxWidth() // Ensures the card spans the full grid cell width
+            .height(150.dp), // Set a consistent height for the card
+        shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = onClick
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(8.dp)
+        Box(
+            modifier = Modifier.fillMaxSize(), // Fill all available space
+            contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(id = imageRes),
                 contentDescription = title,
-                modifier = Modifier.size(48.dp)
+                contentScale = ContentScale.Crop, // Zooms in to fill all pixels and crops if needed
+                modifier = Modifier.fillMaxSize() // Ensures the image fills the card entirely
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(title, fontWeight = FontWeight.Bold, fontSize = 14.sp, textAlign = TextAlign.Center)
+            Text(
+                text = title,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter) // Position the text at the bottom
+                    .padding(8.dp) // Add padding around the text
+            )
         }
     }
 }
@@ -171,12 +194,12 @@ fun ComponentMenuItemCard(title: String, imageRes: Int, onClick: () -> Unit) {
 data class MenuItem(val title: String, val imageRes: Int, val path: String, val instruction: String)
 
 val menuItems = listOf(
-    MenuItem("Numblast", R.drawable.bg, "numblast", "Choose a category: Addition, Subtraction, Multiplication, or Division. Answer as many questions as you can!"),
-    MenuItem("Colormix", R.drawable.bg, "colormix", "Match the color, not the word! Get as many right as you can!"),
-    MenuItem("Oddle", R.drawable.bg, "oddle", "A number will appear on the screen. Choose if it’s Even or Odd."),
-    MenuItem("Shapely", R.drawable.bg, "shapely", "A shape will appear on the screen. Pick the correct name of the shape."),
-    MenuItem("Numline", R.drawable.bg, "numline", "Arrange the given numbers in ascending order. Pick the correct sequence!"),
-    MenuItem("TickTocky", R.drawable.bg, "ticktocky", "A clock will show on the screen. Choose the correct time from the options below!")
+    MenuItem("", R.drawable.numblast, "numblast", "Choose a category: Addition, Subtraction, Multiplication, or Division. Answer as many questions as you can!"),
+    MenuItem("", R.drawable.colormix, "colormix", "Match the color, not the word! Get as many right as you can!"),
+    MenuItem("", R.drawable.oddle, "oddle", "A number will appear on the screen. Choose if it’s Even or Odd."),
+    MenuItem("", R.drawable.shapely, "shapely", "A shape will appear on the screen. Pick the correct name of the shape."),
+    MenuItem("", R.drawable.numline, "numline", "Arrange the given numbers in ascending order. Pick the correct sequence!"),
+    MenuItem("", R.drawable.ticktocky, "ticktocky", "A clock will show on the screen. Choose the correct time from the options below!")
 )
 
 
