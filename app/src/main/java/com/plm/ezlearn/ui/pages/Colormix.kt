@@ -1,5 +1,9 @@
 package com.plm.ezlearn.ui.pages
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,15 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,26 +37,49 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
+import com.plm.ezlearn.ui.components.DialogExplanation
+import com.plm.ezlearn.ui.components.DialogLost
+import com.plm.ezlearn.ui.components.DialogPaused
+import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 
 @Composable
 fun ViewColormix(navController: NavController = rememberNavController()) {
-    val question: String = "69 + 69"
-    val options: List<String> = listOf("69", "69", "69", "69")
-    var isGameWon by remember { mutableStateOf(false) }
-    var isGameLost by remember { mutableStateOf(false) }
+    var question by remember {mutableStateOf(colormixGenerateQuestion())}
     var showExplanation by remember { mutableStateOf(false) }
-    val onOptionClick: (String) -> Unit = {isGameWon = true}
-    val lives: Int = 3
-    val timerProgress: Float = 0.7f // value between 0 and 1
-    val onBackClick: () -> Unit = {showExplanation = true}
+    var isPaused by remember { mutableStateOf(false) }
+    var lives by remember { mutableIntStateOf(3) }
+    var remainingItems by remember { mutableIntStateOf(10) }
+    var progress = remember { Animatable(1f) }
+    val onBackClick: () -> Unit = {isPaused = true}
+    var isGameLost = progress.value <= 0 || lives <= 0
+    var isGameWon = remainingItems <= 0
+    var isCorrect by remember { mutableStateOf(false) }
+    var correctAnswers by remember { mutableIntStateOf(0) }
+
+    BackHandler(enabled = true) {
+        isPaused = true
+    }
+
+    LaunchedEffect(isPaused, isGameWon, isGameLost, showExplanation) {
+        if (!isPaused && !isGameWon && !isGameLost && !showExplanation) {
+            progress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 100000, // 10 seconds
+                    easing = LinearEasing
+                )
+            )
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -85,11 +107,17 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Correct Answers: $correctAnswers",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
-            // Timer bar
             LinearProgressIndicator(
-                progress = { timerProgress },
+                progress = { progress.value },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
@@ -105,7 +133,7 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.bg),
+                    painter = painterResource(id = question.questionImage),
                     contentDescription = "Trophy",
                     modifier = Modifier.size(80.dp)
                 )
@@ -115,16 +143,15 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
 
             // Options
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (row in options.chunked(1)) {
+                for (row in question.options.chunked(1)) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = when (index) {
-                                0 -> Color(0xFFFF9800) // Orange
-                                1 -> Color.LightGray
-                                else -> listOf(Color(0xFFAB47BC), Color(0xFF1565C0)).random()
+                            val bgColor = when (question.answer == option) {
+                                true -> Color(0xFFFF9800) // Orange
+                                false -> Color.LightGray
                             }
                             Box(
                                 modifier = Modifier
@@ -132,7 +159,10 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                                     .height(80.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(bgColor)
-                                    .clickable { onOptionClick(option) },
+                                    .clickable {
+                                        showExplanation = true
+                                        isCorrect = option == question.answer
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -167,13 +197,48 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
             }
         }
         if (isGameWon) {
-            DialogWin(onDismiss = { isGameWon = false })
+            DialogWin(
+                onTryAgain = {
+                    isGameWon = false
+                    navController.navigate("colormix")
+                },
+                onExit = {
+                    isGameWon = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (isGameLost) {
-            DialogLost(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
+            DialogLost(
+                onTryAgain = {
+                    isGameLost = false
+                    navController.navigate("colormix")
+                },
+                onExit = {
+                    isGameLost = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (showExplanation) {
-            DialogExplanation(onContinue = { showExplanation = false })
+            DialogExplanation(onContinue = {
+                showExplanation = false
+                if (isCorrect) {
+                    correctAnswers++
+                    remainingItems--
+                    if (remainingItems > 0) question = colormixGenerateQuestion()
+                } else {
+                    if (--lives > 0) {
+                        question = colormixGenerateQuestion()
+                    }
+                }
+            })
+        }
+        if (isPaused) {
+            DialogPaused(onResume = { isPaused = false }, onExit = {
+                isPaused = false
+                navController.navigate("main-menu")
+            })
         }
     }
 }
@@ -186,77 +251,36 @@ fun PreviewColormix() {
     }
 }
 
-@Composable
-private fun DialogWin(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "YOU WIN",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.bg),
-                    contentDescription = "Trophy",
-                    modifier = Modifier.size(80.dp)
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK", color = Color.White)
-            }
-        },
-        containerColor = Color(0xFF0066FF), // Bright blue
-        shape = RoundedCornerShape(16.dp)
-    )
-}
+private data class ColormixQuestion(
+    val questionImage: Int,     // drawable ID
+    val answer: String,         // correct color name
+    val options: List<String>   // multiple choice
+)
 
-@Composable
-private fun DialogLost(onTryAgain: () -> Unit, onExit: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { /* Prevent dismiss */ },
-        title = {
-            Text("GAME OVER", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        },
-        confirmButton = {
-            Button(onClick = onTryAgain) {
-                Text("TRY AGAIN")
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onExit) {
-                Text("EXIT")
-            }
-        },
-        containerColor = Color.Gray,
-        shape = RoundedCornerShape(12.dp)
-    )
-}
 
-@Composable
-private fun DialogExplanation(onContinue: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onContinue,
-        title = {
-            Text("Explanation", fontWeight = FontWeight.Bold, color = Color.DarkGray)
-        },
-        text = {
-            Text(
-                "When you divide 69 by 69 you only get 1 that is why 1 is the correct answer.",
-                color = Color.Black
-            )
-        },
-        confirmButton = {
-            Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20))) {
-                Text("Continue", color = Color.White)
-            }
-        },
-        containerColor = Color.Green,
-        shape = RoundedCornerShape(12.dp)
+private val colormixImageMap: Map<String, List<Int>> = mapOf(
+    "Red" to listOf(R.drawable.bg, R.drawable.bg),
+    "Blue" to listOf(R.drawable.bg, R.drawable.bg),
+    "Green" to listOf(R.drawable.bg, R.drawable.bg),
+    "Yellow" to listOf(R.drawable.bg, R.drawable.bg),
+    "Orange" to listOf(R.drawable.bg, R.drawable.bg),
+    "Purple" to listOf(R.drawable.bg, R.drawable.bg)
+)
+
+
+private fun colormixGenerateQuestion(): ColormixQuestion {
+    // Choose correct color
+    val correctColor = colormixImageMap.keys.random()
+    val imageList = colormixImageMap[correctColor]!!
+    val questionImage = imageList.random()
+
+    // Get wrong options
+    val otherColors = colormixImageMap.keys.filter { it != correctColor }.shuffled()
+    val options = (listOf(correctColor) + otherColors.take(3)).shuffled()
+
+    return ColormixQuestion(
+        questionImage = questionImage,
+        answer = correctColor,
+        options = options
     )
 }

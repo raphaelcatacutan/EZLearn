@@ -1,5 +1,9 @@
 package com.plm.ezlearn.ui.pages
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +32,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,19 +51,40 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
+import com.plm.ezlearn.ui.components.DialogExplanation
+import com.plm.ezlearn.ui.components.DialogLost
+import com.plm.ezlearn.ui.components.DialogPaused
+import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
 
 @Composable
 fun ViewOddle(navController: NavController = rememberNavController()) {
-    val question: String = "69 + 69"
-    val options: List<String> = listOf("Odd", "Even")
-    var isGameWon by remember { mutableStateOf(false) }
-    var isGameLost by remember { mutableStateOf(false) }
+    var question by remember {mutableStateOf(oddleGenerateQuestion())}
     var showExplanation by remember { mutableStateOf(false) }
-    val onOptionClick: (String) -> Unit = {isGameWon = true}
-    val lives: Int = 3
-    val timerProgress: Float = 0.7f // value between 0 and 1
-    val onBackClick: () -> Unit = {showExplanation = true}
+    var isPaused by remember { mutableStateOf(false) }
+    var lives by remember { mutableIntStateOf(3) }
+    var remainingItems by remember { mutableIntStateOf(10) }
+    var progress = remember { Animatable(1f) }
+    val onBackClick: () -> Unit = {isPaused = true}
+    var isGameLost = progress.value <= 0 || lives <= 0
+    var isGameWon = remainingItems <= 0
+    var isCorrect by remember { mutableStateOf(false) }
+    var correctAnswers by remember { mutableIntStateOf(0) }
+
+    BackHandler(enabled = true) {
+        isPaused = true
+    }
+    LaunchedEffect(isPaused, isGameWon, isGameLost, showExplanation) {
+        if (!isPaused && !isGameWon && !isGameLost && !showExplanation) {
+            progress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 10000, // 10 seconds
+                    easing = LinearEasing
+                )
+            )
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -89,7 +116,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
 
             // Timer bar
             LinearProgressIndicator(
-                progress = { timerProgress },
+                progress = { progress.value },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
@@ -105,7 +132,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = question,
+                    text = question.question,
                     fontSize = 36.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -113,6 +140,8 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            val options: List<String> = listOf("Odd", "Even")
 
             // Options
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -122,10 +151,9 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = when (index) {
-                                0 -> Color(0xFFFF9800) // Orange
-                                1 -> Color.LightGray
-                                else -> listOf(Color(0xFFAB47BC), Color(0xFF1565C0)).random()
+                            val bgColor = when (question.answer == option) {
+                                true -> Color(0xFFFF9800) // Orange
+                                false -> Color.LightGray
                             }
                             Box(
                                 modifier = Modifier
@@ -133,7 +161,10 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                                     .height(80.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(bgColor)
-                                    .clickable { onOptionClick(option) },
+                                    .clickable {
+                                        showExplanation = true
+                                        isCorrect = option == question.answer
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -168,13 +199,48 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
             }
         }
         if (isGameWon) {
-            DialogWin(onDismiss = { isGameWon = false })
+            DialogWin(
+                onTryAgain = {
+                    isGameWon = false
+                    navController.navigate("numblast")
+                },
+                onExit = {
+                    isGameWon = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (isGameLost) {
-            DialogLost(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
+            DialogLost(
+                onTryAgain = {
+                    isGameLost = false
+                    navController.navigate("numblast")
+                },
+                onExit = {
+                    isGameLost = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (showExplanation) {
-            DialogExplanation(onContinue = { showExplanation = false })
+            DialogExplanation(onContinue = {
+                showExplanation = false
+                if (isCorrect) {
+                    correctAnswers++
+                    remainingItems--
+                    if (remainingItems > 0) question = oddleGenerateQuestion()
+                } else {
+                    if (--lives > 0) {
+                        question = oddleGenerateQuestion()
+                    }
+                }
+            })
+        }
+        if (isPaused) {
+            DialogPaused(onResume = { isPaused = false }, onExit = {
+                isPaused = false
+                navController.navigate("main-menu")
+            })
         }
     }
 }
@@ -187,77 +253,17 @@ fun PreviewOddle() {
     }
 }
 
-@Composable
-private fun DialogWin(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "YOU WIN",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.bg),
-                    contentDescription = "Trophy",
-                    modifier = Modifier.size(80.dp)
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK", color = Color.White)
-            }
-        },
-        containerColor = Color(0xFF0066FF), // Bright blue
-        shape = RoundedCornerShape(16.dp)
-    )
-}
+private data class OddleQuestion(
+    val question: String, // just the number as a string
+    val answer: String    // "Odd" or "Even"
+)
 
-@Composable
-private fun DialogLost(onTryAgain: () -> Unit, onExit: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { /* Prevent dismiss */ },
-        title = {
-            Text("GAME OVER", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        },
-        confirmButton = {
-            Button(onClick = onTryAgain) {
-                Text("TRY AGAIN")
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onExit) {
-                Text("EXIT")
-            }
-        },
-        containerColor = Color.Gray,
-        shape = RoundedCornerShape(12.dp)
-    )
-}
+private fun oddleGenerateQuestion(): OddleQuestion {
+    val number = (10..99).random() // 2-digit number
+    val answer = if (number % 2 == 0) "Even" else "Odd"
 
-@Composable
-private fun DialogExplanation(onContinue: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onContinue,
-        title = {
-            Text("Explanation", fontWeight = FontWeight.Bold, color = Color.DarkGray)
-        },
-        text = {
-            Text(
-                "When you divide 69 by 69 you only get 1 that is why 1 is the correct answer.",
-                color = Color.Black
-            )
-        },
-        confirmButton = {
-            Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20))) {
-                Text("Continue", color = Color.White)
-            }
-        },
-        containerColor = Color.Green,
-        shape = RoundedCornerShape(12.dp)
+    return OddleQuestion(
+        question = number.toString(),
+        answer = answer
     )
 }
