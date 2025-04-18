@@ -1,5 +1,11 @@
 package com.plm.ezlearn.ui.pages
 
+import android.R.attr.progress
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,6 +56,8 @@ import com.plm.ezlearn.ui.components.DialogLost
 import com.plm.ezlearn.ui.components.DialogPaused
 import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 
 @Composable
 fun ViewColormix(navController: NavController = rememberNavController()) {
@@ -61,8 +69,27 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
     var isPaused by remember { mutableStateOf(false) }
     val onOptionClick: (String) -> Unit = {isGameWon = true}
     val lives: Int = 3
-    val timerProgress: Float = 0.7f // value between 0 and 1
-    val onBackClick: () -> Unit = {showExplanation = true}
+    val progress = remember { Animatable(1f) }
+    val onBackClick: () -> Unit = {isPaused = true}
+
+    BackHandler(enabled = true) {
+        isPaused = true
+    }
+
+    LaunchedEffect(isPaused, isGameWon, isGameLost) {
+        if (!isPaused && !isGameWon && !isGameLost) {
+            progress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 10000, // 10 seconds
+                    easing = LinearEasing
+                )
+            )
+            if (progress.value <= 0f) {
+                isGameLost = true
+            }
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -92,9 +119,8 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                 )
             }
 
-            // Timer bar
             LinearProgressIndicator(
-                progress = { timerProgress },
+                progress = { progress.value },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
@@ -181,7 +207,10 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
             DialogExplanation(onContinue = { showExplanation = false })
         }
         if (isPaused) {
-            DialogPaused(onResume = { isPaused = false }, onExit = {})
+            DialogPaused(onResume = { isPaused = false }, onExit = {
+                isPaused = false
+                navController.navigate("main-menu")
+            })
         }
     }
 }

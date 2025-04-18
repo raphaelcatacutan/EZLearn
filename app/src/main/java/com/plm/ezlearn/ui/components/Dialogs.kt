@@ -28,11 +28,11 @@ fun DialogPaused(onResume: () -> Unit, onExit: () -> Unit) {
     AlertDialog(
         onDismissRequest = { /* Prevent dismiss */ },
         title = {
-            Text("GAME OVER", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Text("Game Paused", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         },
         confirmButton = {
             Button(onClick = onResume) {
-                Text("TRY AGAIN")
+                Text("Resume")
             }
         },
         dismissButton = {
