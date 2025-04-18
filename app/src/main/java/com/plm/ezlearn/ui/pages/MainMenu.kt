@@ -247,10 +247,10 @@ data class MenuItem(val title: String, val imageRes: Int, val path: String)
 val menuItems = listOf(
     MenuItem("Numblast", R.drawable.bg, "numblast"),
     MenuItem("Colormix", R.drawable.bg, "colormix"),
-    MenuItem("TickTocky", R.drawable.bg, "ticktocky"),
     MenuItem("Oddle", R.drawable.bg, "oddle"),
     MenuItem("Shapely", R.drawable.bg, "shapely"),
-    MenuItem("Numline", R.drawable.bg, "numline")
+    MenuItem("Numline", R.drawable.bg, "numline"),
+    MenuItem("TickTocky", R.drawable.bg, "ticktocky")
 )
 
 
