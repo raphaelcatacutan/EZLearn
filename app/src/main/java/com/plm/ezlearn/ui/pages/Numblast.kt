@@ -1,6 +1,6 @@
 package com.plm.ezlearn.ui.pages
 
-import androidx.compose.foundation.Image
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,15 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,16 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.plm.ezlearn.R
 import com.plm.ezlearn.ui.theme.EZLearnTheme
+import com.plm.ezlearn.ui.components.*
 
 @Composable
 fun ViewNumblast(navController: NavController = rememberNavController()) {
@@ -54,10 +47,15 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
     var isGameWon by remember { mutableStateOf(false) }
     var isGameLost by remember { mutableStateOf(false) }
     var showExplanation by remember { mutableStateOf(false) }
+    var isPaused by remember { mutableStateOf(false) }
     val onOptionClick: (String) -> Unit = {isGameWon = true}
     val lives: Int = 3
     val timerProgress: Float = 0.7f // value between 0 and 1
     val onBackClick: () -> Unit = {showExplanation = true}
+
+    BackHandler(enabled = true) {
+        isPaused = true
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -187,6 +185,9 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
         if (showExplanation) {
             DialogExplanation(onContinue = { showExplanation = false })
         }
+        if (isPaused) {
+            DialogPaused(onResume = { isPaused = false }, onExit = {})
+        }
     }
 }
 
@@ -196,79 +197,4 @@ fun PreviewNumblast() {
     EZLearnTheme {
         ViewNumblast()
     }
-}
-
-@Composable
-private fun DialogWin(onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "YOU WIN",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.bg),
-                    contentDescription = "Trophy",
-                    modifier = Modifier.size(80.dp)
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK", color = Color.White)
-            }
-        },
-        containerColor = Color(0xFF0066FF), // Bright blue
-        shape = RoundedCornerShape(16.dp)
-    )
-}
-
-@Composable
-private fun DialogLost(onTryAgain: () -> Unit, onExit: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { /* Prevent dismiss */ },
-        title = {
-            Text("GAME OVER", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        },
-        confirmButton = {
-            Button(onClick = onTryAgain) {
-                Text("TRY AGAIN")
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onExit) {
-                Text("EXIT")
-            }
-        },
-        containerColor = Color.Gray,
-        shape = RoundedCornerShape(12.dp)
-    )
-}
-
-@Composable
-private fun DialogExplanation(onContinue: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onContinue,
-        title = {
-            Text("Explanation", fontWeight = FontWeight.Bold, color = Color.DarkGray)
-        },
-        text = {
-            Text(
-                "When you divide 69 by 69 you only get 1 that is why 1 is the correct answer.",
-                color = Color.Black
-            )
-        },
-        confirmButton = {
-            Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20))) {
-                Text("Continue", color = Color.White)
-            }
-        },
-        containerColor = Color.Green,
-        shape = RoundedCornerShape(12.dp)
-    )
 }
