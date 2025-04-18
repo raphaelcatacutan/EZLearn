@@ -184,7 +184,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
             }
         }
         if (isGameWon) {
-            DialogWin(onDismiss = { isGameWon = false })
+            DialogWin(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
         }
         if (isGameLost) {
             DialogLost(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })

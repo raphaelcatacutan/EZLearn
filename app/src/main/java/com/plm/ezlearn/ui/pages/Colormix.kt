@@ -57,20 +57,23 @@ import com.plm.ezlearn.ui.components.DialogPaused
 import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import kotlinx.coroutines.delay
+import kotlin.concurrent.timer
 
 @Composable
 fun ViewColormix(navController: NavController = rememberNavController()) {
-    val question: String = "69 + 69"
-    val options: List<String> = listOf("69", "69", "69", "69")
-    var isGameWon by remember { mutableStateOf(false) }
-    var isGameLost by remember { mutableStateOf(false) }
+    var question by remember {mutableStateOf(colormixGenerateQuestion())}
     var showExplanation by remember { mutableStateOf(false) }
     var isPaused by remember { mutableStateOf(false) }
-    val onOptionClick: (String) -> Unit = {isGameWon = true}
-    val lives: Int = 3
-    val progress = remember { Animatable(1f) }
+    var lives by remember { mutableIntStateOf(3) }
+    var remainingItems by remember { mutableIntStateOf(10) }
+    var progress = remember { Animatable(1f) }
     val onBackClick: () -> Unit = {isPaused = true}
+    var isGameLost = progress.value <= 0 || lives <= 0
+    var isGameWon = remainingItems <= 0
+    var isCorrect by remember { mutableStateOf(false) }
+    var correctAnswers by remember { mutableIntStateOf(0) }
 
     BackHandler(enabled = true) {
         isPaused = true
@@ -81,13 +84,10 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
             progress.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
-                    durationMillis = 10000, // 10 seconds
+                    durationMillis = 100000, // 10 seconds
                     easing = LinearEasing
                 )
             )
-            if (progress.value <= 0f) {
-                isGameLost = true
-            }
         }
     }
 
@@ -117,6 +117,13 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Correct Answers: $correctAnswers",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             LinearProgressIndicator(
@@ -136,7 +143,7 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.bg),
+                    painter = painterResource(id = question.questionImage),
                     contentDescription = "Trophy",
                     modifier = Modifier.size(80.dp)
                 )
@@ -146,16 +153,15 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
 
             // Options
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (row in options.chunked(1)) {
+                for (row in question.options.chunked(1)) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = when (index) {
-                                0 -> Color(0xFFFF9800) // Orange
-                                1 -> Color.LightGray
-                                else -> listOf(Color(0xFFAB47BC), Color(0xFF1565C0)).random()
+                            val bgColor = when (question.answer == option) {
+                                true -> Color(0xFFFF9800) // Orange
+                                false -> Color.LightGray
                             }
                             Box(
                                 modifier = Modifier
@@ -163,7 +169,10 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                                     .height(80.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(bgColor)
-                                    .clickable { onOptionClick(option) },
+                                    .clickable {
+                                        showExplanation = true
+                                        isCorrect = option == question.answer
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -198,13 +207,42 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
             }
         }
         if (isGameWon) {
-            DialogWin(onDismiss = { isGameWon = false })
+            DialogWin(
+                onTryAgain = {
+                    isGameWon = false
+                    navController.navigate("colormix")
+                },
+                onExit = {
+                    isGameWon = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (isGameLost) {
-            DialogLost(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
+            DialogLost(
+                onTryAgain = {
+                    isGameLost = false
+                    navController.navigate("colormix")
+                },
+                onExit = {
+                    isGameLost = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (showExplanation) {
-            DialogExplanation(onContinue = { showExplanation = false })
+            DialogExplanation(onContinue = {
+                showExplanation = false
+                if (isCorrect) {
+                    correctAnswers++
+                    remainingItems--
+                    if (remainingItems > 0) question = colormixGenerateQuestion()
+                } else {
+                    if (--lives > 0) {
+                        question = colormixGenerateQuestion()
+                    }
+                }
+            })
         }
         if (isPaused) {
             DialogPaused(onResume = { isPaused = false }, onExit = {
@@ -221,4 +259,38 @@ fun PreviewColormix() {
     EZLearnTheme {
         ViewColormix()
     }
+}
+
+data class ColorQuestion(
+    val questionImage: Int,     // drawable ID
+    val answer: String,         // correct color name
+    val options: List<String>   // multiple choice
+)
+
+
+val colorImageMap: Map<String, List<Int>> = mapOf(
+    "Red" to listOf(R.drawable.bg, R.drawable.bg),
+    "Blue" to listOf(R.drawable.bg, R.drawable.bg),
+    "Green" to listOf(R.drawable.bg, R.drawable.bg),
+    "Yellow" to listOf(R.drawable.bg, R.drawable.bg),
+    "Orange" to listOf(R.drawable.bg, R.drawable.bg),
+    "Purple" to listOf(R.drawable.bg, R.drawable.bg)
+)
+
+
+fun colormixGenerateQuestion(): ColorQuestion {
+    // Choose correct color
+    val correctColor = colorImageMap.keys.random()
+    val imageList = colorImageMap[correctColor]!!
+    val questionImage = imageList.random()
+
+    // Get wrong options
+    val otherColors = colorImageMap.keys.filter { it != correctColor }.shuffled()
+    val options = (listOf(correctColor) + otherColors.take(3)).shuffled()
+
+    return ColorQuestion(
+        questionImage = questionImage,
+        answer = correctColor,
+        options = options
+    )
 }

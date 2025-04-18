@@ -46,32 +46,24 @@ fun DialogPaused(onResume: () -> Unit, onExit: () -> Unit) {
 }
 
 @Composable
-fun DialogWin(onDismiss: () -> Unit) {
+fun DialogWin(onTryAgain: () -> Unit, onExit: () -> Unit) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { /* Prevent dismiss */ },
         title = {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "YOU WIN",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.bg),
-                    contentDescription = "Trophy",
-                    modifier = Modifier.size(80.dp)
-                )
-            }
+            Text("You win", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("OK", color = Color.White)
+            Button(onClick = onTryAgain) {
+                Text("TRY AGAIN")
             }
         },
-        containerColor = Color(0xFF0066FF), // Bright blue
-        shape = RoundedCornerShape(16.dp)
+        dismissButton = {
+            OutlinedButton(onClick = onExit) {
+                Text("EXIT")
+            }
+        },
+        containerColor = Color.Gray,
+        shape = RoundedCornerShape(12.dp)
     )
 }
 

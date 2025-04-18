@@ -177,7 +177,7 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
             }
         }
         if (isGameWon) {
-            DialogWin(onDismiss = { isGameWon = false })
+            DialogWin(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
         }
         if (isGameLost) {
             DialogLost(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
@@ -197,4 +197,54 @@ fun PreviewNumblast() {
     EZLearnTheme {
         ViewNumblast()
     }
+}
+
+data class MathQuestion(
+    val question: String,
+    val answer: String,
+    val options: List<String>
+)
+
+fun numblastGenerateQuestion(): MathQuestion {
+    val operations = listOf("+", "-", "×", "÷")
+    val operation = operations.random()
+
+    val (num1, num2) = when (operation) {
+        "+" -> Pair((1..99).random(), (1..99).random())
+        "-" -> {
+            val a = (1..99).random()
+            val b = (1..a).random() // ensures result is not negative
+            Pair(a, b)
+        }
+        "×" -> Pair((1..12).random(), (1..12).random()) // smaller for young kids
+        "÷" -> {
+            val b = (1..12).random()
+            val a = b * (1..12).random()
+            Pair(a, b) // ensures divisible
+        }
+        else -> Pair(0, 0)
+    }
+
+    val result = when (operation) {
+        "+" -> num1 + num2
+        "-" -> num1 - num2
+        "×" -> num1 * num2
+        "÷" -> num1 / num2
+        else -> 0
+    }
+
+    val correctAnswer = result.toString()
+    val options = mutableSetOf(correctAnswer)
+
+    // Generate 3 unique incorrect options
+    while (options.size < 4) {
+        val wrong = (result + (-10..10).random()).coerceAtLeast(0).toString()
+        options.add(wrong)
+    }
+
+    return MathQuestion(
+        question = "$num1 $operation $num2",
+        answer = correctAnswer,
+        options = options.shuffled()
+    )
 }
