@@ -52,6 +52,12 @@ import androidx.navigation.compose.rememberNavController
 fun ViewMainMenu(navController: NavController = rememberNavController()) {
     var showInstructionDialog by remember { mutableStateOf(false) }
     var dialogPath by remember {mutableStateOf("")}
+    var showNumblastDialog by remember { mutableStateOf(false) }
+    var showColormixDialog by remember { mutableStateOf(false) }
+    var showTickTockyDialog by remember { mutableStateOf(false) }
+    var showOddleDialog by remember { mutableStateOf(false) }
+    var showShapelyDialog by remember { mutableStateOf(false) }
+    var showNumlineDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -116,19 +122,94 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
         ) {
             items(menuItems.size) { index ->
                 val item = menuItems[index]
-                ComponentMenuItemCard(item.title, item.imageRes, {
-                    dialogPath = item.path
-                    showInstructionDialog = true
-                })
+                ComponentMenuItemCard(
+                    title = item.title,
+                    imageRes = item.imageRes,
+                    onClick = {
+                        when (item.title) {
+                            "Numblast" -> showNumblastDialog = true
+                            "Colormix" -> showColormixDialog = true
+                            "TickTocky" -> showTickTockyDialog = true
+                            "Oddle" -> showOddleDialog = true
+                            "Shapely" -> showShapelyDialog = true
+                            "Numline" -> showNumlineDialog = true
+                            else -> navController.navigate(item.path)
+                        }
+                    }
+                )
             }
-
         }
 
-        if (showInstructionDialog) {
-            DialogGameInstruction("", R.drawable.bg, {
-                showInstructionDialog = false
-                navController.navigate(dialogPath)
-            }, onDismiss = { showInstructionDialog = false })
+        if (showNumblastDialog) {
+            DialogGameInstruction(
+                message = "Choose a category: Addition, Subtraction, Multiplication, or Division. Answer as many questions as you can!",
+                imageRes = R.drawable.bg, // Replace with the correct resource
+                onClick = {
+                    navController.navigate("numblast")
+                    showNumblastDialog = false
+                },
+                onDismiss = { showNumblastDialog = false }
+            )
+        }
+
+        if (showColormixDialog) {
+            DialogGameInstruction(
+                message = "Match the color, not the word! Get as many right as you can!",
+                imageRes = R.drawable.bg, // Replace with the correct resource
+                onClick = {
+                    navController.navigate("colormix")
+                    showColormixDialog = false
+                },
+                onDismiss = { showColormixDialog = false }
+            )
+        }
+
+        if (showTickTockyDialog) {
+            DialogGameInstruction(
+                message = "A clock will show on the screen. Choose the correct time from the options below!",
+                imageRes = R.drawable.bg, // Replace with the correct resource
+                onClick = {
+                    navController.navigate("ticktocky")
+                    showTickTockyDialog = false
+                },
+                onDismiss = { showTickTockyDialog = false }
+            )
+        }
+
+        if (showOddleDialog) {
+            DialogGameInstruction(
+                message = "A number will appear on the screen. Choose if it’s Even or Odd.",
+                imageRes = R.drawable.bg, // Replace with the correct resource
+                onClick = {
+                    navController.navigate("oddle")
+                    showOddleDialog = false
+                },
+                onDismiss = { showOddleDialog = false }
+            )
+        }
+
+        if (showShapelyDialog) {
+            DialogGameInstruction(
+                message = "A shape will appear on the screen. Pick the correct name of the shape.",
+                imageRes = R.drawable.bg, // Replace with the correct resource
+                onClick = {
+                    navController.navigate("shapely")
+                    showShapelyDialog = false
+                },
+                onDismiss = { showShapelyDialog = false }
+            )
+        }
+
+        if (showNumlineDialog) {
+            DialogGameInstruction(
+                message = "Arrange the given numbers in ascending order. Pick the correct sequence!",
+                imageRes = R.drawable.bg, // Replace with the correct resource
+                onClick = {
+                    navController.navigate("numline")
+                    showNumlineDialog = false
+                },
+                onDismiss = { showNumlineDialog = false }
+            )
         }
     }
 }
@@ -197,7 +278,7 @@ fun DialogGameInstruction(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 40.dp), // Leave space for image
+                    .padding(top = 40.dp), // Space for image
                 shape = RoundedCornerShape(20.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
@@ -235,7 +316,7 @@ fun DialogGameInstruction(
                     .offset(y = (-10).dp) // Overflow effect
                     .shadow(4.dp, shape = CircleShape)
                     .background(Color.White, shape = CircleShape)
-                    .padding(4.dp) // optional image padding
+                    .padding(4.dp) // Optional image padding
             )
         }
     }
