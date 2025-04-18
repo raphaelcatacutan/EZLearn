@@ -1,5 +1,9 @@
 package com.plm.ezlearn.ui.pages
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +32,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,16 +59,32 @@ import com.plm.ezlearn.ui.theme.EZLearnTheme
 
 @Composable
 fun ViewNumline(navController: NavController = rememberNavController()) {
-    val question: String = "69 + 69"
-    val options: List<String> = listOf("69", "69", "69", "69")
-    var isGameWon by remember { mutableStateOf(false) }
-    var isGameLost by remember { mutableStateOf(false) }
+    var question by remember {mutableStateOf(numlineGenerateQuestion())}
     var showExplanation by remember { mutableStateOf(false) }
-    val onOptionClick: (String) -> Unit = {isGameWon = true}
-    val lives: Int = 3
-    val timerProgress: Float = 0.7f // value between 0 and 1
-    val onBackClick: () -> Unit = {showExplanation = true}
     var isPaused by remember { mutableStateOf(false) }
+    var lives by remember { mutableIntStateOf(3) }
+    var remainingItems by remember { mutableIntStateOf(10) }
+    var progress = remember { Animatable(1f) }
+    val onBackClick: () -> Unit = {isPaused = true}
+    var isGameLost = progress.value <= 0 || lives <= 0
+    var isGameWon = remainingItems <= 0
+    var isCorrect by remember { mutableStateOf(false) }
+    var correctAnswers by remember { mutableIntStateOf(0) }
+
+    BackHandler(enabled = true) {
+        isPaused = true
+    }
+    LaunchedEffect(isPaused, isGameWon, isGameLost, showExplanation) {
+        if (!isPaused && !isGameWon && !isGameLost && !showExplanation) {
+            progress.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(
+                    durationMillis = 10000, // 10 seconds
+                    easing = LinearEasing
+                )
+            )
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -94,7 +116,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
 
             // Timer bar
             LinearProgressIndicator(
-                progress = { timerProgress },
+                progress = { progress.value },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp)
@@ -110,7 +132,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = question,
+                    text = question.question,
                     fontSize = 36.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Bold
@@ -132,16 +154,15 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
 
             // Options
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (row in options.chunked(1)) {
+                for (row in question.options.chunked(1)) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = when (index) {
-                                0 -> Color(0xFFFF9800) // Orange
-                                1 -> Color.LightGray
-                                else -> listOf(Color(0xFFAB47BC), Color(0xFF1565C0)).random()
+                            val bgColor = when (question.answer == option) {
+                                true -> Color(0xFFFF9800) // Orange
+                                false -> Color.LightGray
                             }
                             Box(
                                 modifier = Modifier
@@ -149,7 +170,10 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
                                     .height(80.dp)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(bgColor)
-                                    .clickable { onOptionClick(option) },
+                                    .clickable {
+                                        showExplanation = true
+                                        isCorrect = option == question.answer
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -184,16 +208,48 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
             }
         }
         if (isGameWon) {
-            DialogWin(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
+            DialogWin(
+                onTryAgain = {
+                    isGameWon = false
+                    navController.navigate("numblast")
+                },
+                onExit = {
+                    isGameWon = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (isGameLost) {
-            DialogLost(onTryAgain = { isGameLost = false }, onExit = { isGameLost = false })
+            DialogLost(
+                onTryAgain = {
+                    isGameLost = false
+                    navController.navigate("numblast")
+                },
+                onExit = {
+                    isGameLost = false
+                    navController.navigate("main-menu")
+                }
+            )
         }
         if (showExplanation) {
-            DialogExplanation(onContinue = { showExplanation = false })
+            DialogExplanation(onContinue = {
+                showExplanation = false
+                if (isCorrect) {
+                    correctAnswers++
+                    remainingItems--
+                    if (remainingItems > 0) question = numlineGenerateQuestion()
+                } else {
+                    if (--lives > 0) {
+                        question = numlineGenerateQuestion()
+                    }
+                }
+            })
         }
         if (isPaused) {
-            DialogPaused(onResume = { isPaused = false }, onExit = {})
+            DialogPaused(onResume = { isPaused = false }, onExit = {
+                isPaused = false
+                navController.navigate("main-menu")
+            })
         }
     }
 }
@@ -204,4 +260,34 @@ fun PreviewNumline() {
     EZLearnTheme {
         ViewNumline()
     }
+}
+
+private data class NumlineQuestion(
+    val question: String,        // e.g. "7 2 9 1"
+    val answer: String,          // e.g. "1 2 7 9"
+    val options: List<String>    // shuffled variations, one correct
+)
+
+private fun numlineGenerateQuestion(): NumlineQuestion {
+    val numbers = List(4) { (1..20).random() }
+    val sorted = numbers.sorted()
+
+    val question = numbers.joinToString(", ")
+    val correctAnswer = sorted.joinToString(", ")
+
+    val options = mutableSetOf(correctAnswer)
+
+    // Generate 3 wrong options by shuffling the original list until unique
+    while (options.size < 4) {
+        val shuffled = numbers.shuffled().joinToString(" ")
+        if (shuffled != correctAnswer) {
+            options.add(shuffled)
+        }
+    }
+
+    return NumlineQuestion(
+        question = question,
+        answer = correctAnswer,
+        options = options.shuffled()
+    )
 }
