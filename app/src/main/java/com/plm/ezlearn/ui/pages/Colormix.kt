@@ -1,10 +1,8 @@
 package com.plm.ezlearn.ui.pages
 
-import android.R.attr.progress
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,15 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,8 +50,6 @@ import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
-import kotlinx.coroutines.delay
-import kotlin.concurrent.timer
 
 @Composable
 fun ViewColormix(navController: NavController = rememberNavController()) {
@@ -79,8 +69,8 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
         isPaused = true
     }
 
-    LaunchedEffect(isPaused, isGameWon, isGameLost) {
-        if (!isPaused && !isGameWon && !isGameLost) {
+    LaunchedEffect(isPaused, isGameWon, isGameLost, showExplanation) {
+        if (!isPaused && !isGameWon && !isGameLost && !showExplanation) {
             progress.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
@@ -261,14 +251,14 @@ fun PreviewColormix() {
     }
 }
 
-data class ColorQuestion(
+private data class ColormixQuestion(
     val questionImage: Int,     // drawable ID
     val answer: String,         // correct color name
     val options: List<String>   // multiple choice
 )
 
 
-val colorImageMap: Map<String, List<Int>> = mapOf(
+private val colormixImageMap: Map<String, List<Int>> = mapOf(
     "Red" to listOf(R.drawable.bg, R.drawable.bg),
     "Blue" to listOf(R.drawable.bg, R.drawable.bg),
     "Green" to listOf(R.drawable.bg, R.drawable.bg),
@@ -278,17 +268,17 @@ val colorImageMap: Map<String, List<Int>> = mapOf(
 )
 
 
-fun colormixGenerateQuestion(): ColorQuestion {
+private fun colormixGenerateQuestion(): ColormixQuestion {
     // Choose correct color
-    val correctColor = colorImageMap.keys.random()
-    val imageList = colorImageMap[correctColor]!!
+    val correctColor = colormixImageMap.keys.random()
+    val imageList = colormixImageMap[correctColor]!!
     val questionImage = imageList.random()
 
     // Get wrong options
-    val otherColors = colorImageMap.keys.filter { it != correctColor }.shuffled()
+    val otherColors = colormixImageMap.keys.filter { it != correctColor }.shuffled()
     val options = (listOf(correctColor) + otherColors.take(3)).shuffled()
 
-    return ColorQuestion(
+    return ColormixQuestion(
         questionImage = questionImage,
         answer = correctColor,
         options = options

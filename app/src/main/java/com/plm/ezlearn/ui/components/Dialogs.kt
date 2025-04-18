@@ -58,6 +58,7 @@ fun DialogWin(onTryAgain: () -> Unit, onExit: () -> Unit) {
             }
         },
         dismissButton = {
+
             OutlinedButton(onClick = onExit) {
                 Text("EXIT")
             }
