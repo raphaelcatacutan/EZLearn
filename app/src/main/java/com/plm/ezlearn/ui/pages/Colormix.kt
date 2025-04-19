@@ -50,6 +50,7 @@ import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun ViewColormix(navController: NavController = rememberNavController()) {
@@ -82,10 +83,15 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.bg_colormix),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0288D1)) // blue background
                 .padding(16.dp)
         ) {
             // Top Bar

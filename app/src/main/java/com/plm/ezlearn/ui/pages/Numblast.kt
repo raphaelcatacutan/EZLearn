@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.ui.theme.EZLearnTheme
 import com.plm.ezlearn.ui.components.*
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import com.plm.ezlearn.R
 
 @Composable
 fun ViewNumblast(navController: NavController = rememberNavController()) {
@@ -75,10 +79,15 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = R.drawable.bg_numblast),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF0288D1)) // blue background
                 .padding(16.dp)
         ) {
             // Top Bar
