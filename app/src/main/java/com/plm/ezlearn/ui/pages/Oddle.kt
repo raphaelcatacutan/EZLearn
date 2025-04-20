@@ -266,7 +266,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
             DialogWin(
                 onTryAgain = {
                     isGameWon = false
-                    navController.navigate("numblast")
+                    navController.navigate("oddle")
                 },
                 onExit = {
                     isGameWon = false
@@ -278,7 +278,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
             DialogLost(
                 onTryAgain = {
                     isGameLost = false
-                    navController.navigate("numblast")
+                    navController.navigate("oddle")
                 },
                 onExit = {
                     isGameLost = false

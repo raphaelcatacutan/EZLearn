@@ -264,7 +264,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
             DialogWin(
                 onTryAgain = {
                     isGameWon = false
-                    navController.navigate("colormix")
+                    navController.navigate("shapely")
                 },
                 onExit = {
                     isGameWon = false
@@ -276,7 +276,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
             DialogLost(
                 onTryAgain = {
                     isGameLost = false
-                    navController.navigate("colormix")
+                    navController.navigate("shapely")
                 },
                 onExit = {
                     isGameLost = false
