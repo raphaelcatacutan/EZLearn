@@ -52,7 +52,6 @@ fun ComponentOutlinedText(
         text.forEach { char ->
             val charStr = char.toString()
 
-
             fun hsvToColor(h: Float, s: Float, v: Float): Color {
                 val c = v * s
                 val x = c * (1 - ((h / 60) % 2 - 1).absoluteValue)
@@ -67,17 +66,18 @@ fun ComponentOutlinedText(
                     else -> Triple(c, 0f, x)
                 }
 
-                return Color(r1 + m, g1 + m, b1 + m)
+                return Color(r1 + m, g1 + m, b1 + m, 1f)
             }
-            fun generateBrightColor(): Color {
+
+            fun generateLightBrightColor(): Color {
                 val hue = Random.nextFloat() * 360f
-                val saturation = 0.9f + Random.nextFloat() * 0.1f   // 0.9 to 1.0
-                val value = 0.9f + Random.nextFloat() * 0.1f        // 0.9 to 1.0
+                val saturation = 0.3f + Random.nextFloat() * 0.2f   // 0.3 to 0.5 — soft saturation
+                val value = 0.95f + Random.nextFloat() * 0.05f      // 0.95 to 1.0 — very bright
                 return hsvToColor(hue, saturation, value)
             }
 
             // generate new color for each character if randomizeColor is true
-            val fillColor = remember { if (randomizeColor) generateBrightColor() else fillColor }
+            val fillColor = remember { if (randomizeColor) generateLightBrightColor() else fillColor }
 
             Box {
                 Text(
