@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
@@ -123,22 +125,34 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
                     .height(40.dp)
                     .padding(vertical = 8.dp)
             )
-            // Question Box
-            Box(
+
+            //Question  Box
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color(0xFF7E57C2))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .padding(16.dp), // Optional padding for spacing
+                horizontalArrangement = Arrangement.Center // Centers the box horizontally
             ) {
-                Text(
-                    text = question.question,
-                    fontSize = 36.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                Box(
+                    modifier = Modifier
+                        .width(250.dp) // Preserves the width
+                        .height(200.dp)
+                        .background(
+                            Color.Blue, // Dynamically set background color
+                        )
+                        .border(6.dp, Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = question.question,
+                        fontSize = 36.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
