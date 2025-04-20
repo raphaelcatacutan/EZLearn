@@ -216,7 +216,8 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
                     .fillMaxWidth()
                     .padding(top = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ) {// Lives
+            ) {
+                // Lives
                 ComponentThreeDContainer(
                     modifier = Modifier
                         .width(180.dp)

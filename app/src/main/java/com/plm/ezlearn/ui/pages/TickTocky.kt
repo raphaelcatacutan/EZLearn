@@ -39,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -50,11 +52,14 @@ import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
+import com.plm.ezlearn.ui.components.ComponentOutlinedText
+import com.plm.ezlearn.ui.components.ComponentThreeDContainer
 import com.plm.ezlearn.ui.components.DialogExplanation
 import com.plm.ezlearn.ui.components.DialogLost
 import com.plm.ezlearn.ui.components.DialogPaused
 import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
+import com.plm.ezlearn.ui.theme.shootingStarFont
 
 @Composable
 fun ViewTickTocky(navController: NavController = rememberNavController()) {
@@ -96,36 +101,54 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(vertical = 30.dp, horizontal = 30.dp)
         ) {
+            // Top Bar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = onBackClick) {
+                ComponentThreeDContainer(
+                    modifier = Modifier
+                        .width(55.dp)
+                        .height(55.dp),
+                    backgroundColor = Color(0xFF78909C),
+                    shadowColor = Color(0xFF546E7A),
+                    cornerRadius = 15.dp,
+                    isPushable = true,
+                    onClick = { isPaused = true }
+                ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
+                        contentDescription = "Pause",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "MATH GAME",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                ComponentOutlinedText(
+                    text = "Ticktocky",
+                    fillColor = Color.Magenta,
+                    fontSize = 30.sp,
+                    fontFamily = shootingStarFont,
+                    outlineColor = Color.Black,
+                    outlineDrawStyle = Stroke(10f)
                 )
             }
 
-            // Timer bar
             LinearProgressIndicator(
                 progress = { progress.value },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(vertical = 8.dp)
+                    .height(35.dp)
+                    .padding(vertical = 8.dp),
+                strokeCap = StrokeCap.Round,
+                color = Color(0xFFEF61FF),
+                trackColor = Color(0xFF3C0446),
+                gapSize = 0.dp,
             )
+
+            Spacer(modifier = Modifier.width(16.dp))
 
             //Question  Box
             Row(
@@ -137,11 +160,7 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
                 Box(
                     modifier = Modifier
                         .width(250.dp)
-                        .height(200.dp)
-                        .background(
-                            Color.Magenta,
-                        )
-                        .border(6.dp, Color.White),
+                        .height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     ComponentClockWithHands(hour = question.hour, minute = question.minute)
@@ -152,33 +171,36 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
 
             // Options
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (row in question.options.chunked(1)) {
+                for (row in question.options.chunked(2)) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = when (question.answer == option) {
-                                true -> Color(0xFFFF9800) // Orange
-                                false -> Color.LightGray
-                            }
-                            Box(
+                            val bgColor = if (question.answer == option && showExplanation) Color(
+                                0xFFB6F596
+                            ) else Color(0xFFC980F6)
+                            ComponentThreeDContainer(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .height(80.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(bgColor)
-                                    .clickable {
-                                        showExplanation = true
-                                        isCorrect = option == question.answer
-                                    },
-                                contentAlignment = Alignment.Center
+                                    .width(150.dp)
+                                    .height(150.dp),
+                                backgroundColor = bgColor,
+                                shadowColor = Color(0xFF1F331F),
+                                cornerRadius = 15.dp,
+                                onClick = {
+                                    showExplanation = true
+                                    isCorrect = option == question.answer
+                                },
+                                isPushable = true
                             ) {
                                 Text(
                                     text = option,
-                                    fontSize = 24.sp,
+                                    fontSize = 50.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color.Black,
+                                    letterSpacing = 5.sp,
+                                    modifier = Modifier
+                                        .padding(top = 5.dp)
                                 )
                             }
                         }
@@ -188,20 +210,49 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Lives
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.Center
+                    .padding(top = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                repeat(3) { index ->
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Life",
-                        tint = if (index < lives) Color.Red else Color.LightGray,
-                        modifier = Modifier.size(32.dp)
-                    )
+                // Lives
+                ComponentThreeDContainer(
+                    modifier = Modifier
+                        .width(180.dp)
+                        .height(90.dp),
+                    backgroundColor = Color(0xFFFFB4B4),
+                    shadowColor = Color(0xFF6B1520),
+                    cornerRadius = 15.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            repeat(3) { index ->
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = "Life",
+                                    tint = if (index < lives) Color.Red else Color.LightGray,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                        Text(
+                            text = "Correct Answers: $correctAnswers / 10",
+                            color = Color.Black,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                        )
+                    }
                 }
             }
         }
@@ -209,7 +260,7 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
             DialogWin(
                 onTryAgain = {
                     isGameWon = false
-                    navController.navigate("colormix")
+                    navController.navigate("ticktocky")
                 },
                 onExit = {
                     isGameWon = false
@@ -221,7 +272,7 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
             DialogLost(
                 onTryAgain = {
                     isGameLost = false
-                    navController.navigate("colormix")
+                    navController.navigate("ticktocky")
                 },
                 onExit = {
                     isGameLost = false
