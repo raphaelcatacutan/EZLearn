@@ -51,6 +51,7 @@ import com.plm.ezlearn.ui.theme.EZLearnTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.layout.ContentScale
+import androidx.core.graphics.toColorInt
 
 @Composable
 fun ViewColormix(navController: NavController = rememberNavController()) {
@@ -129,18 +130,21 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                     .height(40.dp)
                     .padding(vertical = 8.dp)
             )
+
             // Question Box
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .background(Color(0xFF7E57C2))
+                    .background(
+                        Color(question.answer.toColorInt()) // Dynamically set background color
+                    )
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(id = question.questionImage),
-                    contentDescription = "Trophy",
+                    contentDescription = null,
                     modifier = Modifier.size(80.dp)
                 )
             }
