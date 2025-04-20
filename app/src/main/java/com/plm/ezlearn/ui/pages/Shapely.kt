@@ -84,7 +84,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
             progress.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
-                    durationMillis = 100000, // 10 seconds
+                    durationMillis = 60000, // 10 seconds
                     easing = LinearEasing
                 )
             )
@@ -154,7 +154,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(Color.Transparent),
+                    .background(Color.Blue),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(

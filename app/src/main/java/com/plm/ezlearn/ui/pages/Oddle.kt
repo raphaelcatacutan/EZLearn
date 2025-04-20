@@ -81,7 +81,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
             progress.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
-                    durationMillis = 100000, // 10 seconds
+                    durationMillis = 60000, // 10 seconds
                     easing = LinearEasing
                 )
             )

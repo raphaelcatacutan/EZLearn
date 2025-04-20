@@ -83,7 +83,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
             progress.animateTo(
                 targetValue = 0f,
                 animationSpec = tween(
-                    durationMillis = 10000, // 10 seconds
+                    durationMillis = 60000, // 10 seconds
                     easing = LinearEasing
                 )
             )
