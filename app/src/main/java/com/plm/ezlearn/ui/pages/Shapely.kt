@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,11 +51,15 @@ import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
+import com.plm.ezlearn.ui.components.ComponentOutlinedText
+import com.plm.ezlearn.ui.components.ComponentThreeDContainer
 import com.plm.ezlearn.ui.components.DialogExplanation
 import com.plm.ezlearn.ui.components.DialogLost
 import com.plm.ezlearn.ui.components.DialogPaused
 import com.plm.ezlearn.ui.components.DialogWin
 import com.plm.ezlearn.ui.theme.EZLearnTheme
+import com.plm.ezlearn.ui.theme.chalkboardFont
+import com.plm.ezlearn.ui.theme.shootingStarFont
 
 @Composable
 fun ViewShapely(navController: NavController = rememberNavController()) {
@@ -94,63 +101,78 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(vertical = 30.dp, horizontal = 30.dp)
         ) {
             // Top Bar
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = onBackClick) {
+                ComponentThreeDContainer(
+                    modifier = Modifier
+                        .width(55.dp)
+                        .height(55.dp),
+                    backgroundColor = Color(0xFF78909C),
+                    shadowColor = Color(0xFF546E7A),
+                    cornerRadius = 15.dp,
+                    isPushable = true,
+                    onClick = { isPaused = true }
+                ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
+                        contentDescription = "Pause",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "MATH GAME",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                ComponentOutlinedText(
+                    text = "Shapely",
+                    fillColor = Color.Green,
+                    fontSize = 30.sp,
+                    fontFamily = shootingStarFont,
+                    outlineColor = Color.Black,
+                    outlineDrawStyle = Stroke(10f)
                 )
             }
 
-            // Timer bar
             LinearProgressIndicator(
                 progress = { progress.value },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(vertical = 8.dp)
+                    .height(35.dp)
+                    .padding(vertical = 8.dp),
+                strokeCap = StrokeCap.Round,
+                color = Color(0xFF61FF71),
+                trackColor = Color(0xFF044607),
+                gapSize = 0.dp,
             )
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Row(
+            //Question  Box
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp), // Optional padding for spacing
-                horizontalArrangement = Arrangement.Center // Centers the box horizontally
+                    .height(200.dp)
+                    .background(Color.Transparent),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
+                Text(
+                    text = "What shape is the image below?",
+                    fontSize = 25.sp,
+                    fontFamily = chalkboardFont,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    painter = painterResource(id = question.questionImage),
+                    contentDescription = null,
                     modifier = Modifier
-                        .width(250.dp) // Preserves the width
-                        .height(200.dp)
-                        .background(
-                            Color(0xFFFF9800), // Dynamically set background color
-                        )
-                        .border(6.dp, Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = question.questionImage),
-                        contentDescription = null,
-                        modifier = Modifier.size(80.dp)
-                    )
-                }
+                        .fillMaxHeight()
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Options
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -160,27 +182,30 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = when (question.answer == option) {
-                                true -> Color(0xFFFF9800) // Orange
-                                false -> Color.LightGray
-                            }
-                            Box(
+                            val bgColor = if (question.answer == option && showExplanation) Color(
+                                0xFFB6F596
+                            ) else Color(0xFFFCFF96)
+                            ComponentThreeDContainer(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .height(80.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(bgColor)
-                                    .clickable {
-                                        showExplanation = true
-                                        isCorrect = option == question.answer
-                                    },
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .height(80.dp),
+                                backgroundColor = bgColor,
+                                shadowColor = Color(0xFF1F331F),
+                                cornerRadius = 15.dp,
+                                onClick = {
+                                    showExplanation = true
+                                    isCorrect = option == question.answer
+                                },
+                                isPushable = true
                             ) {
                                 Text(
                                     text = option,
-                                    fontSize = 24.sp,
+                                    fontSize = 26.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color.Black,
+                                    letterSpacing = 5.sp,
+                                    modifier = Modifier
+                                        .padding(top = 5.dp)
                                 )
                             }
                         }
@@ -190,20 +215,48 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Lives
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(3) { index ->
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Life",
-                        tint = if (index < lives) Color.Red else Color.LightGray,
-                        modifier = Modifier.size(32.dp)
-                    )
+                    .padding(top = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {// Lives
+                ComponentThreeDContainer(
+                    modifier = Modifier
+                        .width(180.dp)
+                        .height(90.dp),
+                    backgroundColor = Color(0xFFFFB4B4),
+                    shadowColor = Color(0xFF6B1520),
+                    cornerRadius = 15.dp
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            repeat(3) { index ->
+                                Icon(
+                                    imageVector = Icons.Default.Favorite,
+                                    contentDescription = "Life",
+                                    tint = if (index < lives) Color.Red else Color.LightGray,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                        Text(
+                            text = "Correct Answers: $correctAnswers / 10",
+                            color = Color.Black,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                        )
+                    }
                 }
             }
         }
