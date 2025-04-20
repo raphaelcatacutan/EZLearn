@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -131,22 +132,29 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                     .padding(vertical = 8.dp)
             )
 
-            // Question Box
-            Box(
+            //Question  Box
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(
-                        Color(question.answer.toColorInt()) // Dynamically set background color
-                    )
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .padding(16.dp), // Optional padding for spacing
+                horizontalArrangement = Arrangement.Center // Centers the box horizontally
             ) {
-                Image(
-                    painter = painterResource(id = question.questionImage),
-                    contentDescription = null,
-                    modifier = Modifier.size(80.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .width(250.dp) // Preserves the width
+                        .height(200.dp)
+                        .background(
+                            Color(question.answer.toColorInt()), // Dynamically set background color
+                        )
+                        .border(6.dp, Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = question.questionImage),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -269,12 +277,12 @@ private data class ColormixQuestion(
 
 
 private val colormixImageMap: Map<String, List<Int>> = mapOf(
-    "Red" to listOf(R.drawable.bg, R.drawable.bg),
-    "Blue" to listOf(R.drawable.bg, R.drawable.bg),
-    "Green" to listOf(R.drawable.bg, R.drawable.bg),
-    "Yellow" to listOf(R.drawable.bg, R.drawable.bg),
-    "Orange" to listOf(R.drawable.bg, R.drawable.bg),
-    "Purple" to listOf(R.drawable.bg, R.drawable.bg)
+    "Red" to listOf(R.drawable.red_square, R.drawable.red_square),
+    "Blue" to listOf(R.drawable.blue_diamond, R.drawable.blue_diamond),
+    "Green" to listOf(R.drawable.green_circle, R.drawable.green_circle),
+    "Yellow" to listOf(R.drawable.yellow_triangle, R.drawable.yellow_triangle),
+    "Orange" to listOf(R.drawable.orange_rectangle, R.drawable.orange_rectangle),
+    "Purple" to listOf(R.drawable.purple_pentagon, R.drawable.purple_pentagon)
 )
 
 

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
@@ -123,20 +125,29 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
                     .height(40.dp)
                     .padding(vertical = 8.dp)
             )
-            // Question Box
-            Box(
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color(0xFF7E57C2))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .padding(16.dp), // Optional padding for spacing
+                horizontalArrangement = Arrangement.Center // Centers the box horizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.bg),
-                    contentDescription = "Trophy",
-                    modifier = Modifier.size(80.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .width(250.dp) // Preserves the width
+                        .height(200.dp)
+                        .background(
+                            Color(0xFFFF9800), // Dynamically set background color
+                        )
+                        .border(6.dp, Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = question.questionImage),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -259,12 +270,12 @@ private data class ShapelyQuestion(
 
 
 private val shapelyImageMap: Map<String, List<Int>> = mapOf(
-    "Circle" to listOf(R.drawable.bg, R.drawable.bg),
-    "Square" to listOf(R.drawable.bg, R.drawable.bg),
-    "Triangle" to listOf(R.drawable.bg, R.drawable.bg),
-    "Rectangle" to listOf(R.drawable.bg, R.drawable.bg),
-    "Star" to listOf(R.drawable.bg, R.drawable.bg),
-    "Heart" to listOf(R.drawable.bg, R.drawable.bg)
+    "Circle" to listOf(R.drawable.green_circle, R.drawable.green_circle),
+    "Square" to listOf(R.drawable.red_square, R.drawable.red_square),
+    "Triangle" to listOf(R.drawable.yellow_triangle, R.drawable.yellow_triangle),
+    "Rectangle" to listOf(R.drawable.orange_rectangle, R.drawable.orange_rectangle),
+    "Pentagon" to listOf(R.drawable.purple_pentagon, R.drawable.purple_pentagon),
+    "Oval" to listOf(R.drawable.green_oval, R.drawable.green_oval)
 )
 
 private fun shapelyGenerateQuestion(): ShapelyQuestion {
