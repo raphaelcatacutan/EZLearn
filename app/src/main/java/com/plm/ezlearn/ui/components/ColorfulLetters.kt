@@ -25,7 +25,7 @@ import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 @Composable
-fun OutlinedText(
+fun ComponentOutlinedText(
     text: String,
     modifier: Modifier = Modifier,
     fillColor: Color = Color.Unspecified,
@@ -125,28 +125,3 @@ fun OutlinedText(
     }
 }
 
-
-@Composable
-fun ComponentColorfulLetters(text: String) {
-    Row {
-        for (char in text) {
-            val randomColor = Color(
-                red = Random.nextFloat(),
-                green = Random.nextFloat(),
-                blue = Random.nextFloat(),
-                alpha = 1f
-            )
-
-            Text(
-                text = char.toString(),
-                style = TextStyle(
-                    color = randomColor,
-                    drawStyle = Stroke(
-                        width = 4f, // Stroke width for the outline
-                    )
-                ),
-                fontSize = 20.sp, fontFamily = shootingStarFont
-            )
-        }
-    }
-}

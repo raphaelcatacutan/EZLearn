@@ -4,7 +4,6 @@ import com.plm.ezlearn.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -49,11 +47,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.plm.ezlearn.ui.components.ComponentColorfulLetters
 import com.plm.ezlearn.ui.components.ComponentThreeDContainer
-import com.plm.ezlearn.ui.components.OutlinedText
+import com.plm.ezlearn.ui.components.ComponentOutlinedText
 import com.plm.ezlearn.ui.theme.chalkboardFont
-import com.plm.ezlearn.ui.theme.shootingStarFont
 
 
 @Composable
@@ -89,7 +85,7 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
                         .border(1.dp, Color.White, CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                OutlinedText(
+                ComponentOutlinedText(
                     "Hello, Raphael",
                     fillColor = Color.White,
                     outlineColor = Color.Black,
