@@ -143,9 +143,7 @@ fun ViewColormix(navController: NavController = rememberNavController()) {
                     modifier = Modifier
                         .width(250.dp) // Preserves the width
                         .height(200.dp)
-                        .background(
-                            Color(question.answer.toColorInt()), // Dynamically set background color
-                        )
+                        .background(Color.Transparent)
                         .border(6.dp, Color.White),
                     contentAlignment = Alignment.Center
                 ) {
@@ -274,7 +272,6 @@ private data class ColormixQuestion(
     val answer: String,         // correct color name
     val options: List<String>   // multiple choice
 )
-
 
 private val colormixImageMap: Map<String, List<Int>> = mapOf(
     "Red" to listOf(R.drawable.red_square, R.drawable.red_square),
