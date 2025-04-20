@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -76,7 +77,7 @@ fun ComponentOutlinedText(
             }
 
             // generate new color for each character if randomizeColor is true
-            val fillColor = if (randomizeColor) generateBrightColor() else fillColor
+            val fillColor = remember { if (randomizeColor) generateBrightColor() else fillColor }
 
             Box {
                 Text(
