@@ -6,6 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -44,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.plm.ezlearn.R
@@ -123,16 +126,26 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
                     .height(40.dp)
                     .padding(vertical = 8.dp)
             )
-            // Question Box
-            Box(
+
+            //Question  Box
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color(0xFF7E57C2))
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .padding(16.dp), // Optional padding for spacing
+                horizontalArrangement = Arrangement.Center // Centers the box horizontally
             ) {
-                ComponentClockWithHands(hour = question.hour, minute = question.minute)
+                Box(
+                    modifier = Modifier
+                        .width(250.dp)
+                        .height(200.dp)
+                        .background(
+                            Color.Magenta,
+                        )
+                        .border(6.dp, Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ComponentClockWithHands(hour = question.hour, minute = question.minute)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -287,23 +300,25 @@ fun ComponentClockWithHands(hour: Int, minute: Int, modifier: Modifier = Modifie
         modifier = modifier.size(200.dp)
     ) {
         Image(
-            painter = painterResource(R.drawable.bg),
+            painter = painterResource(R.drawable.clock),
             contentDescription = "Clock face",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .padding(12.dp)
+                .clip(CircleShape)
         )
 
         Image(
-            painter = painterResource(R.drawable.bg),
+            painter = painterResource(R.drawable.minute_hand),
             contentDescription = "Minute hand",
             modifier = Modifier
-                .fillMaxSize()
+                .height(170.dp)
                 .graphicsLayer {
                     rotationZ = minuteRotation
                 }
         )
 
         Image(
-            painter = painterResource(R.drawable.bg),
+            painter = painterResource(R.drawable.hour_hand),
             contentDescription = "Hour hand",
             modifier = Modifier
                 .fillMaxSize()
