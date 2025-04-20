@@ -154,7 +154,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(Color.Blue),
+                    .background(Color.Transparent),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(

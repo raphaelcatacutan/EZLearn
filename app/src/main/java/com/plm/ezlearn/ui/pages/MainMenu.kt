@@ -1,5 +1,6 @@
 package com.plm.ezlearn.ui.pages
 
+import androidx.activity.compose.BackHandler
 import com.plm.ezlearn.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,8 @@ import com.plm.ezlearn.ui.theme.chalkboardFont
 fun ViewMainMenu(navController: NavController = rememberNavController()) {
     var showInstructionDialog by remember { mutableStateOf(false) }
     var instructionMenu by remember {mutableStateOf(MenuItem("", 0, "", ""))}
+
+    BackHandler(enabled = false) { }
 
     Image(
         painter = painterResource(id = R.drawable.bg),

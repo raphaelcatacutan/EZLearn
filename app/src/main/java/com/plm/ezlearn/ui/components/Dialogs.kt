@@ -98,7 +98,7 @@ fun DialogPaused(onResume: () -> Unit, onExit: () -> Unit) {
 
             // Logo "floating" above dialog content
             Image(
-                painter = painterResource(id = R.drawable.paused),
+                painter = painterResource(id = R.drawable.pause),
                 contentDescription = "Logo",
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -175,7 +175,7 @@ fun DialogWin(onTryAgain: () -> Unit, onExit: () -> Unit) {
 
             // Logo "floating" above dialog content
             Image(
-                painter = painterResource(id = R.drawable.paused),
+                painter = painterResource(id = R.drawable.win3),
                 contentDescription = "Logo",
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -321,7 +321,7 @@ fun DialogExplanation(onContinue: () -> Unit) {
             }
 
             Image(
-                painter = painterResource(id = R.drawable.paused),
+                painter = painterResource(id = R.drawable.explanation),
                 contentDescription = "Logo",
                 modifier = Modifier
                     .align(Alignment.TopCenter)
