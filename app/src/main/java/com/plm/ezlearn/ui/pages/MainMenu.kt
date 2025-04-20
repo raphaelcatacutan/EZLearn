@@ -214,12 +214,12 @@ fun ComponentMenuItemCard(
 data class MenuItem(val title: String, val imageRes: Int, val path: String, val instruction: String)
 
 val menuItems = listOf(
-    MenuItem("", R.drawable.numblast, "numblast", "Choose a category: Addition, Subtraction, Multiplication, or Division. Answer as many questions as you can!"),
-    MenuItem("", R.drawable.colormix, "colormix", "Match the color, not the word! Get as many right as you can!"),
-    MenuItem("", R.drawable.oddle, "oddle", "A number will appear on the screen. Choose if it’s Even or Odd."),
-    MenuItem("", R.drawable.shapely, "shapely", "A shape will appear on the screen. Pick the correct name of the shape."),
-    MenuItem("", R.drawable.numline, "numline", "Arrange the given numbers in ascending order. Pick the correct sequence!"),
-    MenuItem("", R.drawable.ticktocky, "ticktocky", "A clock will show on the screen. Choose the correct time from the options below!")
+    MenuItem("", R.drawable.numblast, "numblast", "Solve 10 simple math problems in 60 seconds! You’ve got 3 lives — make them count!"),
+    MenuItem("", R.drawable.colormix, "colormix", "Match the color of the image in 60 seconds! You’ve got 3 lives — make them count!"),
+    MenuItem("", R.drawable.oddle, "oddle", "Choose if the number is Even or Odd in 60 seconds! You’ve got 3 lives — make them count!"),
+    MenuItem("", R.drawable.shapely, "shapely", "Pick the correct name of the shape in 60 seconds! You’ve got 3 lives — make them count!"),
+    MenuItem("", R.drawable.numline, "numline", "Arrange the given numbers in ascending order in 60 seconds! You’ve got 3 lives — make them count!"),
+    MenuItem("", R.drawable.ticktocky, "ticktocky", "Choose the correct time in 60 seconds! You’ve got 3 lives — make them count!")
 )
 
 
