@@ -163,7 +163,8 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
                     fontWeight = FontWeight.Bold,
                     fontSize = 80.sp,
                     fontFamily = shootingStarFont,
-                    outlineDrawStyle = Stroke(10f)
+                    outlineDrawStyle = Stroke(10f),
+                    letterSpacing = 5.sp
                 )
             }
 
@@ -179,7 +180,7 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
                         row.forEachIndexed { index, option ->
                             val bgColor = if (question.answer == option && showExplanation) Color(
                                 0xFFB6F596
-                            ) else Color(0xFFFCFF96)
+                            ) else Color(0xFF80D2F6)
                             ComponentThreeDContainer(
                                 modifier = Modifier
                                     .width(150.dp)
@@ -195,7 +196,7 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
                             ) {
                                 Text(
                                     text = option,
-                                    fontSize = 30.sp,
+                                    fontSize = 50.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black,
                                     letterSpacing = 5.sp,
