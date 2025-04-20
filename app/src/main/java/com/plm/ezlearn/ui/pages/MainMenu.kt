@@ -4,6 +4,7 @@ import com.plm.ezlearn.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +49,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.plm.ezlearn.ui.components.ComponentColorfulLetters
+import com.plm.ezlearn.ui.components.ComponentThreeDContainer
+import com.plm.ezlearn.ui.components.OutlinedText
+import com.plm.ezlearn.ui.theme.chalkboardFont
+import com.plm.ezlearn.ui.theme.shootingStarFont
 
 
 @Composable
@@ -59,55 +67,55 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
         modifier = Modifier.fillMaxSize(),
         contentScale = ContentScale.Crop
     )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(vertical = 30.dp, horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top bar: profile + level
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = R.drawable.bg), // your drawable
+                    painter = painterResource(id = R.drawable.boy), // your drawable
                     contentDescription = "Avatar",
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(50.dp)
                         .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape)
+                        .border(1.dp, Color.White, CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Grace", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                OutlinedText(
+                    "Hello, Raphael",
+                    fillColor = Color.White,
+                    outlineColor = Color.Black,
+                    fontSize = 25.sp,
+                    fontFamily = chalkboardFont,
+                    randomizeColor = false,
+                    outlineDrawStyle = Stroke(width = 7f),
+                    letterSpacing = 3.sp
+                )
             }
 
-            Box(
+            ComponentThreeDContainer(
                 modifier = Modifier
-                    .background(Color(0xFFFFD54F), RoundedCornerShape(12.dp))
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
+                    .width(90.dp)
+                    .height(40.dp),
+                backgroundColor = Color(0xFFD7A700),
+                shadowColor = Color(0xFF5A3A00),
+                cornerRadius = 10.dp
             ) {
-                Text("Level 1", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            }
-        }
-
-        // Banner
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp),
-            shape = RoundedCornerShape(24.dp),
-            elevation = CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF))
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text("Let’s play\nwith us!", fontSize = 24.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                // Add background image here if needed
+                Text(
+                    text = "Level 1",
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                    fontSize = 23.sp,
+                    modifier = Modifier
+                        .padding(top = 3.dp)
+                )
             }
         }
 
@@ -115,9 +123,11 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            modifier = Modifier.fillMaxSize()
+            horizontalArrangement = Arrangement.spacedBy(15.dp),
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .offset(y = 150.dp)
         ) {
             items(menuItems.size) { index ->
                 val item = menuItems[index]
@@ -148,6 +158,17 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
             )
         }
     }
+
+    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth() ) {
+        Image(
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Logo",
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .size(260.dp)
+                .offset(y = 30.dp)
+        )
+    }
 }
 
 @Composable
@@ -162,7 +183,7 @@ fun ComponentMenuItemCard(
             .fillMaxWidth() // Ensures the card spans the full grid cell width
             .height(150.dp), // Set a consistent height for the card
         shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(6.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp, pressedElevation = 0.dp, focusedElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         onClick = onClick
     ) {
@@ -223,34 +244,44 @@ fun DialogGameInstruction(
                 .wrapContentSize()
                 .padding(16.dp)
         ) {
-            // Main card background
-            Card(
+            ComponentThreeDContainer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 40.dp), // Space for image
-                shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    .height(415.dp)
+                    .padding(top = 110.dp, bottom = 50.dp),
+                backgroundColor = Color(0xFFADC8D9),
+                shadowColor = Color(0xFF797C8C),
+                cornerRadius = 15.dp,
+                isPushable = false,
             ) {
                 Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier
-                        .background(Color.White)
-                        .padding(top = 56.dp, start = 24.dp, end = 24.dp, bottom = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp)
+                        .padding(top = 25.dp)
                 ) {
                     Text(
                         text = message,
-                        fontSize = 18.sp,
-                        color = Color.Black,
-                        textAlign = TextAlign.Center
+                        fontSize = 25.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
-                        onClick = onClick,
-                        modifier = Modifier.fillMaxWidth()
+                    ComponentThreeDContainer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(55.dp),
+                        backgroundColor = Color(0xFF9AF386),
+                        shadowColor = Color(0xFF136B01),
+                        cornerRadius = 15.dp,
+                        isPushable = true,
+                        onClick = onClick
                     ) {
-                        Text(text = "Play")
+                        Text("Play", fontSize = 22.sp, color = Color.Black)
                     }
                 }
             }
@@ -258,9 +289,9 @@ fun DialogGameInstruction(
             // Image floating above the dialog
             Box(
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(120.dp)
                     .align(Alignment.TopCenter)
-                    .offset(y = (-10).dp)
+                    .offset(y = 15.dp)
                     .shadow(4.dp, shape = RoundedCornerShape(8.dp)) // Applies rounded shadow
                     .background(Color.White, shape = RoundedCornerShape(8.dp))
                     .padding(4.dp) // Optional padding within the container

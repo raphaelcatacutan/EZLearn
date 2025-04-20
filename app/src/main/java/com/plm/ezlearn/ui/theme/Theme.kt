@@ -4,12 +4,21 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import com.plm.ezlearn.R
+import com.plm.ezlearn.ui.theme.Typography
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -33,6 +42,28 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+
+val chalkboardFont = FontFamily(
+    Font(R.font.chalk_board, FontWeight.Normal)
+)
+val shootingStarFont = FontFamily(
+    Font(R.font.shooting_star, FontWeight.Normal)
+)
+
+private val chalkboard = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = chalkboardFont,
+        fontSize = 16.sp
+    ),
+)
+
+private val shootingStar = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = chalkboardFont,
+        fontSize = 16.sp
+    ),
+)
+
 @Composable
 fun EZLearnTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -52,7 +83,7 @@ fun EZLearnTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = chalkboard,
         content = content
     )
 }
