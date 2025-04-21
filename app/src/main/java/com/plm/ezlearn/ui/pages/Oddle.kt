@@ -1,5 +1,6 @@
 package com.plm.ezlearn.ui.pages
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -184,9 +185,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         row.forEachIndexed { index, option ->
-                            val bgColor = if (question.answer == option && showExplanation) Color(
-                                0xFFB6F596
-                            ) else Color(0xFFEE80F6)
+                            val bgColor = Color(0xFF80D2F6)
                             ComponentThreeDContainer(
                                 modifier = Modifier
                                     .width(150.dp)
@@ -194,22 +193,31 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                                 backgroundColor = bgColor,
                                 shadowColor = Color(0xFF1F331F),
                                 cornerRadius = 15.dp,
-                                onClick = {
-                                    showExplanation = true
-                                    explanation = question.explanation
-                                    isCorrect = option == question.answer
-                                },
                                 isPushable = true
                             ) {
-                                Text(
-                                    text = option,
-                                    fontSize = 50.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
-                                    letterSpacing = 5.sp,
+                                Row(
                                     modifier = Modifier
-                                        .padding(top = 5.dp)
-                                )
+                                        .fillMaxSize()
+                                        .clickable {
+                                            explanation = question.explanation
+                                            isCorrect = question.answer == option
+                                            Log.w("ComposeWarning", "Correct: $isCorrect, Option: $option, Correct Answer: ${question.answer}")
+                                            showExplanation = true
+                                        },
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+
+                                    Text(
+                                        text = option,
+                                        fontSize = 50.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.Black,
+                                        letterSpacing = 5.sp,
+                                        modifier = Modifier
+                                            .padding(top = 5.dp)
+                                    )
+                                }
                             }
                         }
                     }
