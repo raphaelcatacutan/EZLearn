@@ -110,7 +110,7 @@ fun ViewMainMenu(navController: NavController = rememberNavController()) {
             ) {
                 Text(
                     text = "Level 1",
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                    style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black),
                     fontSize = 23.sp,
                     modifier = Modifier
                         .padding(top = 3.dp)
