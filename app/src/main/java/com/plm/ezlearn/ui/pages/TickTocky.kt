@@ -69,7 +69,7 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
     var lives by remember { mutableIntStateOf(3) }
     var remainingItems by remember { mutableIntStateOf(10) }
     var progress = remember { Animatable(1f) }
-    val onBackClick: () -> Unit = {isPaused = true}
+    var explanation by remember { mutableStateOf("") }
     var isGameLost = progress.value <= 0 || lives <= 0
     var isGameWon = remainingItems <= 0
     var isCorrect by remember { mutableStateOf(false) }
@@ -189,6 +189,7 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
                                 cornerRadius = 15.dp,
                                 onClick = {
                                     showExplanation = true
+                                    explanation = question.explanation
                                     isCorrect = option == question.answer
                                 },
                                 isPushable = true
@@ -292,7 +293,7 @@ fun ViewTickTocky(navController: NavController = rememberNavController()) {
                         question = ticktockyGenerateQuestion()
                     }
                 }
-            })
+            }, explanation)
         }
         if (isPaused) {
             DialogPaused(onResume = { isPaused = false }, onExit = {
@@ -313,10 +314,12 @@ fun PreviewTickTocky() {
 
 private data class TicktockyQuestion(
     val hour: Int,                  // 1 to 12
-    val minute: Int,                // 0, 15, 30, 45 (for simplicity)
+    val minute: Int,                // 0, 15, 30, 45
     val answer: String,             // "3:15"
-    val options: List<String>       // ["3:15", "4:00", "6:30", "12:00"]
+    val options: List<String>,      // ["3:15", "4:00", "6:30", "12:00"]
+    val explanation: String         // "The minute hand points to 3, which is 15 minutes..."
 )
+
 private fun ticktockyGenerateQuestion(): TicktockyQuestion {
     val hours = (1..12).random()
     val minutesList = listOf(0, 15, 30, 45)
@@ -333,13 +336,25 @@ private fun ticktockyGenerateQuestion(): TicktockyQuestion {
         options.add(fake)
     }
 
+    // Build explanation
+    val minuteHandPosition = when (minutes) {
+        0 -> "12"
+        15 -> "3"
+        30 -> "6"
+        45 -> "9"
+        else -> "unknown"
+    }
+    val explanation = "The right answer is $correctAnswer. The hour hand points to $hours and the minute hand points to $minuteHandPosition, which means it's $minutes minutes past $hours."
+
     return TicktockyQuestion(
         hour = hours,
         minute = minutes,
         answer = correctAnswer,
-        options = options.shuffled()
+        options = options.shuffled(),
+        explanation = explanation
     )
 }
+
 
 @Composable
 fun ComponentClockWithHands(hour: Int, minute: Int, modifier: Modifier = Modifier) {

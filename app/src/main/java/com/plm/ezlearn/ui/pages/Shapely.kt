@@ -69,7 +69,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
     var lives by remember { mutableIntStateOf(3) }
     var remainingItems by remember { mutableIntStateOf(10) }
     var progress = remember { Animatable(1f) }
-    val onBackClick: () -> Unit = {isPaused = true}
+    var explanation by remember { mutableStateOf("") }
     var isGameLost = progress.value <= 0 || lives <= 0
     var isGameWon = remainingItems <= 0
     var isCorrect by remember { mutableStateOf(false) }
@@ -194,6 +194,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
                                 cornerRadius = 15.dp,
                                 onClick = {
                                     showExplanation = true
+                                    explanation = question.explanation
                                     isCorrect = option == question.answer
                                 },
                                 isPushable = true
@@ -296,7 +297,7 @@ fun ViewShapely(navController: NavController = rememberNavController()) {
                         question = shapelyGenerateQuestion()
                     }
                 }
-            })
+            }, explanation)
         }
         if (isPaused) {
             DialogPaused(onResume = { isPaused = false }, onExit = {
@@ -318,32 +319,32 @@ fun PreviewShapely() {
 private data class ShapelyQuestion(
     val questionImage: Int,     // drawable ID
     val answer: String,         // correct shape name
-    val options: List<String>   // multiple choice
+    val options: List<String>,   // multiple choice
+    val explanation: String
 )
 
 
-private val shapelyImageMap: Map<String, List<Int>> = mapOf(
-    "Circle" to listOf(R.drawable.green_circle, R.drawable.green_circle),
-    "Square" to listOf(R.drawable.red_square, R.drawable.red_square),
-    "Triangle" to listOf(R.drawable.yellow_triangle, R.drawable.yellow_triangle),
-    "Rectangle" to listOf(R.drawable.orange_rectangle, R.drawable.orange_rectangle),
-    "Pentagon" to listOf(R.drawable.purple_pentagon, R.drawable.purple_pentagon),
-    "Oval" to listOf(R.drawable.green_oval, R.drawable.green_oval)
+private val shapelyImageMap: Map<String, Pair<List<Int>, String>> = mapOf(
+    "Circle" to Pair(listOf(R.drawable.green_circle, R.drawable.green_circle), "The right answer is Circle. You can usually see this shape in wheels, clocks, and coins."),
+    "Square" to Pair(listOf(R.drawable.red_square, R.drawable.red_square), "The right answer is Square. You can usually see this shape in tiles, windows, and board games."),
+    "Triangle" to Pair(listOf(R.drawable.yellow_triangle, R.drawable.yellow_triangle), "The right answer is Triangle. You can usually see this shape in road signs, slices of pizza, and pyramids."),
+    "Rectangle" to Pair(listOf(R.drawable.orange_rectangle, R.drawable.orange_rectangle), "The right answer is Rectangle. You can usually see this shape in books, doors, and screens."),
+    "Pentagon" to Pair(listOf(R.drawable.purple_pentagon, R.drawable.purple_pentagon), "The right answer is Pentagon. You can usually see this shape in certain buildings, badges, and tiles."),
+    "Oval" to Pair(listOf(R.drawable.green_oval, R.drawable.green_oval), "The right answer is Oval. You can usually see this shape in mirrors, eggs, and racetracks.")
 )
 
 private fun shapelyGenerateQuestion(): ShapelyQuestion {
     val correctShape = shapelyImageMap.keys.random()
-    val imageList = shapelyImageMap[correctShape]!!
+    val (imageList, explanation) = shapelyImageMap[correctShape]!!
     val questionImage = imageList.random()
 
-    // Get wrong options
     val otherShapes = shapelyImageMap.keys.filter { it != correctShape }.shuffled()
     val options = (listOf(correctShape) + otherShapes.take(3)).shuffled()
 
     return ShapelyQuestion(
         questionImage = questionImage,
         answer = correctShape,
-        options = options
+        options = options,
+        explanation = explanation
     )
 }
-

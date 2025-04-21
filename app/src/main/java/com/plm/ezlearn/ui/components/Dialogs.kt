@@ -206,8 +206,8 @@ fun DialogLost(onTryAgain: () -> Unit, onExit: () -> Unit) {
                     .fillMaxWidth()
                     .height(430.dp)
                     .padding(top = 160.dp, bottom = 50.dp),
-                backgroundColor = Color(0xFFF1A9FC),
-                shadowColor = Color(0xFF833F70),
+                backgroundColor = Color(0xFFA15906),
+                shadowColor = Color(0xFF49210F),
                 cornerRadius = 15.dp,
                 isPushable = false,
             ) {
@@ -264,7 +264,7 @@ fun DialogLost(onTryAgain: () -> Unit, onExit: () -> Unit) {
 }
 
 @Composable
-fun DialogExplanation(onContinue: () -> Unit) {
+fun DialogExplanation(onContinue: () -> Unit, explanation: String) {
     Dialog(
         onDismissRequest = onContinue,
         properties = DialogProperties(
@@ -281,7 +281,7 @@ fun DialogExplanation(onContinue: () -> Unit) {
             ComponentThreeDContainer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(460.dp)
+                    .height(470.dp)
                     .padding(top = 150.dp, bottom = 50.dp),
                 backgroundColor = Color(0xFF4F96DC),
                 shadowColor = Color(0xFF221A94),
@@ -294,13 +294,14 @@ fun DialogExplanation(onContinue: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 30.dp)
-                        .padding(top = 20.dp)
+                        .padding(top = 30.dp)
                 ) {
 
                     Text(
-                        "When you divide 69 by 69 you only get 1 that is why 1 is the correct answer.",
+                        explanation,
                         color = Color.Black,
-                        fontSize = 25.sp
+                        fontSize = 25.sp,
+                        textAlign = TextAlign.Center
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))

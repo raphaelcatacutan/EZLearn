@@ -61,8 +61,8 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
     var isPaused by remember { mutableStateOf(false) }
     var lives by remember { mutableIntStateOf(3) }
     var remainingItems by remember { mutableIntStateOf(10) }
+    var explanation by remember { mutableStateOf("") }
     var progress = remember { Animatable(1f) }
-    val onBackClick: () -> Unit = {isPaused = true}
     var isGameLost = progress.value <= 0 || lives <= 0
     var isGameWon = remainingItems <= 0
     var isCorrect by remember { mutableStateOf(false) }
@@ -190,6 +190,7 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
                                 cornerRadius = 15.dp,
                                 onClick = {
                                     showExplanation = true
+                                    explanation = question.explanation
                                     isCorrect = option == question.answer
                                 },
                                 isPushable = true
@@ -293,7 +294,7 @@ fun ViewNumblast(navController: NavController = rememberNavController()) {
                         question = numblastGenerateQuestion()
                     }
                 }
-            })
+            }, explanation)
         }
         if (isPaused) {
             DialogPaused(onResume = { isPaused = false }, onExit = {
@@ -315,7 +316,8 @@ fun PreviewNumblast() {
 private data class NumblastQuestion(
     val question: String,
     val answer: String,
-    val options: List<String>
+    val options: List<String>,
+    val explanation: String
 )
 
 private fun numblastGenerateQuestion(): NumblastQuestion {
@@ -326,14 +328,14 @@ private fun numblastGenerateQuestion(): NumblastQuestion {
         "+" -> Pair((1..99).random(), (1..99).random())
         "-" -> {
             val a = (1..99).random()
-            val b = (1..a).random() // ensures result is not negative
+            val b = (1..a).random()
             Pair(a, b)
         }
-        "×" -> Pair((1..12).random(), (1..12).random()) // smaller for young kids
+        "×" -> Pair((1..12).random(), (1..12).random())
         "÷" -> {
             val b = (1..12).random()
             val a = b * (1..12).random()
-            Pair(a, b) // ensures divisible
+            Pair(a, b)
         }
         else -> Pair(0, 0)
     }
@@ -349,15 +351,24 @@ private fun numblastGenerateQuestion(): NumblastQuestion {
     val correctAnswer = result.toString()
     val options = mutableSetOf(correctAnswer)
 
-    // Generate 3 unique incorrect options
     while (options.size < 4) {
         val wrong = (result + (-10..10).random()).coerceAtLeast(0).toString()
         options.add(wrong)
     }
 
+    val explanation = when (operation) {
+        "+" -> "When we add $num1 and $num2 together, we are combining both amounts. $num1 plus $num2 equals $result."
+        "-" -> "Subtraction means taking away. If we start with $num1 and take away $num2, we are left with $result."
+        "×" -> "Multiplication is repeated addition. $num1 times $num2 means we are adding $num1 a total of $num2 times, which gives us $result."
+        "÷" -> "Division means splitting into equal parts. If we divide $num1 into $num2 equal groups, each group will have $result."
+        else -> ""
+    }
+
     return NumblastQuestion(
         question = "$num1 $operation $num2",
         answer = correctAnswer,
-        options = options.shuffled()
+        options = options.shuffled(),
+        explanation = explanation
     )
 }
+

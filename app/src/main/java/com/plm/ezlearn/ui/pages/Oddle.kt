@@ -67,7 +67,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
     var lives by remember { mutableIntStateOf(3) }
     var remainingItems by remember { mutableIntStateOf(10) }
     var progress = remember { Animatable(1f) }
-    val onBackClick: () -> Unit = {isPaused = true}
+    var explanation by remember { mutableStateOf("") }
     var isGameLost = progress.value <= 0 || lives <= 0
     var isGameWon = remainingItems <= 0
     var isCorrect by remember { mutableStateOf(false) }
@@ -196,6 +196,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                                 cornerRadius = 15.dp,
                                 onClick = {
                                     showExplanation = true
+                                    explanation = question.explanation
                                     isCorrect = option == question.answer
                                 },
                                 isPushable = true
@@ -298,7 +299,7 @@ fun ViewOddle(navController: NavController = rememberNavController()) {
                         question = oddleGenerateQuestion()
                     }
                 }
-            })
+            }, explanation)
         }
         if (isPaused) {
             DialogPaused(onResume = { isPaused = false }, onExit = {
@@ -319,15 +320,25 @@ fun PreviewOddle() {
 
 private data class OddleQuestion(
     val question: String, // just the number as a string
-    val answer: String    // "Odd" or "Even"
+    val answer: String,    // "Odd" or "Even"
+    val explanation: String
 )
 
 private fun oddleGenerateQuestion(): OddleQuestion {
     val number = (10..99).random() // 2-digit number
-    val answer = if (number % 2 == 0) "Even" else "Odd"
+    val isEven = number % 2 == 0
+    val answer = if (isEven) "Even" else "Odd"
+
+    val explanation = if (isEven) {
+        "$number is divisible by 2 with no remainder, so it's an even number."
+    } else {
+        "$number is not divisible by 2 evenly, so it's an odd number."
+    }
 
     return OddleQuestion(
         question = number.toString(),
-        answer = answer
+        answer = answer,
+        explanation = explanation
     )
 }
+

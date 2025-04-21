@@ -69,7 +69,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
     var lives by remember { mutableIntStateOf(3) }
     var remainingItems by remember { mutableIntStateOf(10) }
     var progress = remember { Animatable(1f) }
-    val onBackClick: () -> Unit = {isPaused = true}
+    var explanation by remember { mutableStateOf("") }
     var isGameLost = progress.value <= 0 || lives <= 0
     var isGameWon = remainingItems <= 0
     var isCorrect by remember { mutableStateOf(false) }
@@ -197,6 +197,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
                                 cornerRadius = 15.dp,
                                 onClick = {
                                     showExplanation = true
+                                    explanation = question.explanation
                                     isCorrect = option == question.answer
                                 },
                                 isPushable = true
@@ -299,7 +300,7 @@ fun ViewNumline(navController: NavController = rememberNavController()) {
                         question = numlineGenerateQuestion()
                     }
                 }
-            })
+            }, explanation)
         }
         if (isPaused) {
             DialogPaused(onResume = { isPaused = false }, onExit = {
@@ -321,7 +322,8 @@ fun PreviewNumline() {
 private data class NumlineQuestion(
     val question: String,        // e.g. "7 2 9 1"
     val answer: String,          // e.g. "1 2 7 9"
-    val options: List<String>    // shuffled variations, one correct
+    val options: List<String>,    // shuffled variations, one correct
+    val explanation: String
 )
 
 private fun numlineGenerateQuestion(): NumlineQuestion {
@@ -335,15 +337,19 @@ private fun numlineGenerateQuestion(): NumlineQuestion {
 
     // Generate 3 wrong options by shuffling the original list until unique
     while (options.size < 4) {
-        val shuffled = numbers.shuffled().joinToString(" ")
+        val shuffled = numbers.shuffled().joinToString(", ")
         if (shuffled != correctAnswer) {
             options.add(shuffled)
         }
     }
 
+    val explanation = "To arrange numbers in order, we compare their values from smallest to largest. " +
+            "That's why $question become $correctAnswer."
+
     return NumlineQuestion(
         question = question,
         answer = correctAnswer,
-        options = options.shuffled()
+        options = options.shuffled(),
+        explanation = explanation
     )
 }
