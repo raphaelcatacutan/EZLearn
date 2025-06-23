@@ -8,7 +8,6 @@ EZLearn is an Android app that helps kids learn in a fun and interactive way. It
   <img src="images/1.jpg" alt="demo 3" width="200" hspace="5"/>
   <img src="images/2.jpg" alt="demo 2" width="200" hspace="5"/>
   <img src="images/3.jpg" alt="demo 2" width="200" hspace="5"/>
-  <img src="images/4.jpg" alt="demo 2" width="200" hspace="5"/>
 </p>
 
 
